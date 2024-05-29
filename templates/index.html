@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio/Video Transcription</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            padding-top: 50px;
+            background-color: #f8f9fa;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2, h3 {
+            margin-bottom: 20px;
+        }
+        .custom-file-input {
+            cursor: pointer;
+        }
+        .custom-file-label::after {
+            content: "Browse";
+        }
+        a {
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center">Upload Audio/Video File</h1>
+        <form action="{{ url_for('upload_file') }}" method="post" enctype="multipart/form-data">
+            <div class="custom-file mb-3">
+                <input type="file" class="custom-file-input" id="file" name="file" accept=".mp4, .wav, .mp3, .m4a, .flac, .aac, .ogg, .wma, .webm, .mkv, .avi, .mov" required>
+                <label class="custom-file-label" for="file">Choose file</label>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">Upload</button>
+            {% if show_reset_button %}
+            <!-- Reset button -->
+
+                <a  class="btn btn-secondary btn-block" id="reset-btn" href="/" style="color:white">Reset Form</a>
+
+            {% endif %}
+        </form>
+
+        {% if transcription %}
+            <h2>Transcription:</h2>
+            <p>{{ transcription }}</p>
+            <h3>Download Transcription:</h3>
+            <div class="btn-custom btn-group" role="group">
+                <a href="{{ url_for('download_file', file_format='txt') }}" class="btn btn-secondary">Download as TXT</a>
+                <a href="{{ url_for('download_file', file_format='pdf') }}" class="btn btn-secondary">Download as PDF</a>
+                <a href="{{ url_for('download_file', file_format='srt') }}" class="btn btn-secondary">Download as SRT</a>
+            </div>
+
+
+        {% endif %}
+
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        // Show the file name in the custom file input label
+        $(".custom-file-input").on("change", function() {
+            var fileName = $(this).val().split("\\").pop();
+            $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+        });
+        // Reset form fields and go back to homepage on reset button click
+        $('#reset-btn').on('click', function() {
+            $('#upload-form')[0].reset();
+            $('#transcription').text('');
+            window.location.href = '/';
+        });
+         // Clear uploads and transcriptions folders
+            $.get("/reset");
+    </script>
+</body>
+</html>
